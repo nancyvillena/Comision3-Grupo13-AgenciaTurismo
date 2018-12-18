@@ -23,14 +23,15 @@ public class Conexion {
     private Connection con = null;
    
    
-   public Conexion(){
-   
-       try {
-           Class.forName("org.mariadb.jdbc.Driver");
-       } catch (ClassNotFoundException ex) {
-           Logger.getLogger(Conexion.class.getName()).log(Level.SEVERE, null, ex);
-       }
-   
+    public Conexion(String url, String usuario, String password) throws ClassNotFoundException {
+        this.url = url;
+        this.usuario = usuario;
+        this.password = password;
+
+        //Cargamos las clases de mariadb que implementan JDBC
+        Class.forName("org.mariadb.jdbc.Driver");
+
+    
    
    }
    

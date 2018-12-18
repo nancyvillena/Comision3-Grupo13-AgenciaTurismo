@@ -5,17 +5,34 @@
  */
 package agenciadeturismo.Vistas;
 
+import agenciadeturismo.Modelo.AlojamientoData;
+import agenciadeturismo.Modelo.Conexion;
+import com.sun.nio.sctp.AssociationChangeNotification;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Asus
  */
 public class AlojamientoVistas extends javax.swing.JInternalFrame {
+    
+    private AlojamientoData alojamientoData;
+    private Conexion con;
 
     /**
      * Creates new form AlojamientoVistas
      */
     public AlojamientoVistas() {
-        initComponents();
+        
+         try {
+           initComponents();
+            
+            con =new Conexion("jdbc:mysql://localhost/agencia_turismo","root","");
+            alojamientoData= new AlojamientoData(con);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AlojamientoVistas.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -40,11 +57,16 @@ public class AlojamientoVistas extends javax.swing.JInternalFrame {
         jtCamas = new javax.swing.JTextField();
         jtCostos = new javax.swing.JTextField();
         chFumador = new javax.swing.JCheckBox();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btBuscar = new javax.swing.JButton();
+        btGuardar = new javax.swing.JButton();
+        btActualizar = new javax.swing.JButton();
+        btBorrar = new javax.swing.JButton();
+        btLimpiar = new javax.swing.JButton();
+
+        setClosable(true);
+        setIconifiable(true);
+        setMaximizable(true);
+        setResizable(true);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 51));
@@ -74,15 +96,20 @@ public class AlojamientoVistas extends javax.swing.JInternalFrame {
             }
         });
 
-        jButton1.setText("Buscar");
+        btBuscar.setText("Buscar");
 
-        jButton2.setText("Guardar");
+        btGuardar.setText("Guardar");
+        btGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btGuardarActionPerformed(evt);
+            }
+        });
 
-        jButton3.setText("Actualizar");
+        btActualizar.setText("Actualizar");
 
-        jButton4.setText("Borrar");
+        btBorrar.setText("Borrar");
 
-        jButton5.setText("Limpiar");
+        btLimpiar.setText("Limpiar");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -98,7 +125,7 @@ public class AlojamientoVistas extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jtId, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(btBuscar)
                 .addGap(49, 49, 49))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -133,13 +160,13 @@ public class AlojamientoVistas extends javax.swing.JInternalFrame {
                                 .addComponent(chFumador))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(20, 20, 20)
-                        .addComponent(jButton2)
+                        .addComponent(btGuardar)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton3)
+                        .addComponent(btActualizar)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton4)
+                        .addComponent(btBorrar)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton5)))
+                        .addComponent(btLimpiar)))
                 .addContainerGap(42, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -153,7 +180,7 @@ public class AlojamientoVistas extends javax.swing.JInternalFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(jtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton1))
+                            .addComponent(btBuscar))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
@@ -175,10 +202,10 @@ public class AlojamientoVistas extends javax.swing.JInternalFrame {
                     .addComponent(jtCostos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4)
-                    .addComponent(jButton5))
+                    .addComponent(btGuardar)
+                    .addComponent(btActualizar)
+                    .addComponent(btBorrar)
+                    .addComponent(btLimpiar))
                 .addGap(34, 34, 34))
         );
 
@@ -193,14 +220,24 @@ public class AlojamientoVistas extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jtCamasActionPerformed
 
+    private void btGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btGuardarActionPerformed
+        
+        String nombre=jtNombre.getText();
+        String direccion=jtDireccion.getText();
+        
+        boolean fumador= chFumador.isEnabled();
+        Alojamiento alojamiento= new Alojamiento(nombre,direccion,AssociationChangeNotification.)
+        alojamientoData.guardarAlojamiento(alojamiento);
+    }//GEN-LAST:event_btGuardarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btActualizar;
+    private javax.swing.JButton btBorrar;
+    private javax.swing.JButton btBuscar;
+    private javax.swing.JButton btGuardar;
+    private javax.swing.JButton btLimpiar;
     private javax.swing.JCheckBox chFumador;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
